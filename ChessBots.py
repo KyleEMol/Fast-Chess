@@ -155,6 +155,8 @@ class NoFilter(FilterBot):
         if len(LegalMoves) == 0:
             return None
         
+        if self.DecisionBot == None:
+            return LegalMoves
         return self.DecisionBot.Choose(BoardDict = BoardDict, LegalMoves = LegalMoves, PiecesDict = PiecesDict,  Colour = Colour)
 
 class Pacifist(FilterBot):
@@ -190,7 +192,6 @@ class Pacifist(FilterBot):
             return self.RandomMoves(BoardDict,PiecesDict,Colour)
 
         return self.DecisionBot.Choose(BoardDict = BoardDict, LegalMoves = ChosenMoves, PiecesDict = PiecesDict,  Colour = Colour)
-
 class WarmongerBot(FilterBot):
     def __init__(self,DecisionBot = RandomMoveBot):
         FilterBot.__init__(self,DecisionBot)

@@ -109,11 +109,8 @@ def FindingLegalMoves(Pos,BoardDict):
                 Diff = Direction + Direction2
                 LoopNum = 1 
 
-                while True:
+                while BoardBoundsChecker(Pos+Diff):
                     Diff = LoopNum*(Direction + Direction2)
-                    LoopNum += 1 
-                    if not BoardBoundsChecker(Pos+Diff):
-                        break
 
                     if BoardDict.get(Pos+Diff) == None:
                         LegalDestinations.add(Pos+Diff)
