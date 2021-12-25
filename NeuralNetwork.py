@@ -25,7 +25,7 @@ def ActivationFunction(x):
 def RandomMatrix(Layout = tuple or list,Min = int,Max=int):
     Range = Max-Min
     NewMatrix = []
-    for _ in range(Layout[1]):
+    for _ in range(Layout[0]):
         Matrix = np.random.rand(Layout[1])
         NewMatrix.append(np.array(list(map((lambda x: Min + Range*x),Matrix))))
     
@@ -68,11 +68,3 @@ class NeuralNetwork():
 
         return NewNetwork
         
-Test = NeuralNetwork(Layout = [2,4,2,1])
-# print(Test.Weights)
-# print(Test.PreviousChanges)
-# print(Test.BiasList)
-print(Test.Output([1,1]))
-print(Test.MakingAnEvolvedNetwork())
-
-#print(RandomMatrix((2,2),-1,1))

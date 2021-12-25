@@ -129,9 +129,12 @@ Filter Bots
 class FilterBot(BasicBot):
     def __init__(self,DecisionBot = RandomMoveBot):
         BasicBot.__init__(self)
-        self.DecisionBot = DecisionBot()
-        self.Name = self.Name +" "+ self.DecisionBot.Name
-        print("")
+
+        if DecisionBot != None:
+            self.DecisionBot = DecisionBot()
+        else:
+            self.DecisionBot = None
+        self.Name = self.Name +" "+ (self.DecisionBot.Name if self.DecisionBot != None else "")
 
 class NoFilter(FilterBot):
     def __init__(self,DecisionBot = RandomMoveBot):
@@ -158,7 +161,6 @@ class NoFilter(FilterBot):
         if self.DecisionBot == None:
             return LegalMoves
         return self.DecisionBot.Choose(BoardDict = BoardDict, LegalMoves = LegalMoves, PiecesDict = PiecesDict,  Colour = Colour)
-
 class Pacifist(FilterBot):
     def __init__(self,DecisionBot = RandomMoveBot):
         FilterBot.__init__(self,DecisionBot)
