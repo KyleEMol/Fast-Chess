@@ -103,12 +103,12 @@ def CheckingKingAttackers(BoardDict = dict ,PieceDict = dict,Colour = str):
         NumberOfKingsUnderAttack += CheckingIfPieceIsAttacked(BoardDict = BoardDict ,PieceLocation = King,Colour = Colour)
     return NumberOfKingsUnderAttack
 
-class NeuralNetworkPlayer(BasicBot):
+class NeuralNetworkPlayer(BasicBot,FilterBot = FilterBot(None)):
     def __init__(self):
         BasicBot.__init__(self)
         self.Name = "NeuralNetworkPlayer"
         self.NeuralNetwork = NeuralNetwork
-        self.FilterBot = NoFilter(None)
+        self.FilterBot = FilterBot
 
     def Move(self,BoardDict ,PiecesDict, Colour):
 
@@ -140,3 +140,8 @@ class NeuralNetworkPlayer(BasicBot):
 
         Evaluation = self.NeuralNetwork.Output(Input)
         return Evaluation
+
+    def Evolve(self):
+        NewPlayer = NeuralNetworkPlayer(FilterBot = self.FilterBot)
+        NewPlayer.NeuralNetwork = self.NeuralNetwork.MakingAnEvolvedNetwork()
+        
