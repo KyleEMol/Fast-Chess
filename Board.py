@@ -109,17 +109,16 @@ def FindingLegalMoves(Pos,BoardDict):
                 Diff = Direction + Direction2
                 LoopNum = 1 
 
-                while BoardBoundsChecker(Pos+Diff):
+                while True:
                     Diff = LoopNum*(Direction + Direction2)
-
+                    if not  BoardBoundsChecker(Pos+Diff):break
+                    LoopNum += 1 
                     if BoardDict.get(Pos+Diff) == None:
                         LegalDestinations.add(Pos+Diff)
                         continue
 
                     if BoardDict.get(Pos+Diff)[0] != PieceType[0]:
                         LegalDestinations.add(Pos+Diff)
-                                        
-                    
                     break
     
     elif PieceType[-1] == "N":
@@ -400,6 +399,7 @@ def DisplayingBoard(BoardDict,Wait = 0,LastMove = None):
     DispBoard = [[[[ " " for Y in range(8)] for X in range(8)] for W in range(3)] for Z in range(3)]
     for Key in BoardDict:
         TempKey = str(Key)
+        while len(TempKey) < 4:TempKey = "0" + TempKey
         DispBoard[int(TempKey[0])-1][int(TempKey[1])-1][int(TempKey[2])-1][int(TempKey[3])-1] = NameUnicodeDict[BoardDict[Key]]
     
     if LastMove != None:DispBoard[int(LastMove[0])-1][int(LastMove[1])-1][int(LastMove[2])-1][int(LastMove[3])-1] = "X"

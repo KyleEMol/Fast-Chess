@@ -18,7 +18,7 @@ def BasicGame(Player1,Player2):
     while True:
         MoveNum+=1
 
-        if MoveNum >= 300:
+        if MoveNum >= 500:
             return 0.5
 
         if len(Pieces["WK"]) + len(Pieces["BK"]) < 18:break
@@ -179,3 +179,40 @@ def EternalTournament(ListOfPlayers = ListOfEveryBot(),NumberOfGamesPerMatch = 3
             writer.writerow(["NumberOfRounds",NumberOfRounds])
             for Player in ListOfPlayers:
                 writer.writerow([Player.Name,Player.Rating])
+
+def FindingEloOfABot(Bot,ListOfOpponents = CulledListOfBots(),NumberOfGamesPerMatch = 3):
+    ListOfOpponents = GettingBotEloForList([ Player for Player in ListOfOpponents if Player.Name != Bot.Name]) 
+    Bot = GettingBotEloForList([Bot])[0]
+    DictOfPlayers = {Player.Name:Player.Rating for Player in ListOfOpponents + [Bot]}
+    NumberOfRounds = 0
+
+    with open('TournamentResults.csv', newline='') as csvfile:
+        reader = csv.reader(csvfile, delimiter=',', quotechar='|')
+
+        for row in reader:
+            if len(row) == 0:continue
+            
+            if row[0] == "NumberOfRounds":
+                DictOfPlayers["NumberOfRounds"] = row[1]
+                break
+    while True:
+        for _ in range(5):
+            Player2 = random.choice(ListOfOpponents)
+            Players = [Bot,Player2]
+            random.shuffle(Players)
+            for _ in range(NumberOfGamesPerMatch):
+                RatedGame(Players[0], Players[1])
+
+        NumberOfRounds += 1
+        print(f"Round Number : {NumberOfRounds}")
+        DictOfPlayers[Bot.Name] = Bot.Rating
+        
+        with open('TournamentResultsDict', 'wb') as f:
+            pickle.dump(DictOfPlayers,f)
+
+        with open('TournamentResults.csv', "w") as f:
+            writer = csv.writer(f)
+            writer.writerow(["PlayerName","PlayerRating"])
+            writer.writerow(["NumberOfRounds",DictOfPlayers["NumberOfRounds"]])
+            for Player in sorted(ListOfOpponents + [Bot],key=(lambda X:DictOfPlayers[X.Name]),reverse=True):
+                writer.writerow([Player.Name,DictOfPlayers[Player.Name]])

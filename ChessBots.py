@@ -39,11 +39,11 @@ class BasicBot():
         Pieces = []
         for Key in ListOfNames:Pieces += list(PiecesDict[Key])
 
-        while True:
-            Piece = random.choice(Pieces)
+        random.shuffle(Pieces)
+        for Piece in Pieces:
             Moves = FindingLegalMoves(Piece,BoardDict)
-            if len(Moves) > 0: return [Piece,random.choice(list(Moves))]
-            Pieces.remove(Piece)
+            if len(Moves) > 0: 
+                return (Piece,random.choice(list(Moves)))
     
     def Move(self,BoardDict ,PiecesDict, Colour):
         return self.RandomMoves(BoardDict ,PiecesDict, Colour)

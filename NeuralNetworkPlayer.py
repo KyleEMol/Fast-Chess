@@ -104,9 +104,9 @@ def CheckingKingAttackers(BoardDict = dict ,PieceDict = dict,Colour = str):
     return NumberOfKingsUnderAttack
 
 class NeuralNetworkPlayer(BasicBot):
-    def __init__(self,FilterBot = NoFilter(None)):
+    def __init__(self,FilterBot = NoFilter(None),Name = "NeuralNetwork"):
         BasicBot.__init__(self)
-        self.Name = "NeuralNetworkPlayer"
+        self.Name = Name
         self.NeuralNetwork = NeuralNetwork(Layout = [14,28,56,28,14,1])
         self.FilterBot = FilterBot
 
@@ -119,8 +119,8 @@ class NeuralNetworkPlayer(BasicBot):
 
         for Move in LegalMoves:
             NewBoard = MovingAPiece(Move[0],Move[1],BoardDict,PiecesDict)
-            
-            Eval = round(self.Evaluate(NewBoard[0],NewBoard[1],Colour),2)
+            Eval = float(self.Evaluate(NewBoard[0],NewBoard[1],Colour))
+            Eval = round(Eval,2)
     
             if Eval > BestEval:
                 BestMoves = [Move]

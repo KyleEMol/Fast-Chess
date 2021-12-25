@@ -22,7 +22,7 @@ def CulledListOfBots():
             CulledListOfAllBots.append(FilterBot(EvalBot))
 
     CulledListOfAllBots.append(Pacifist(RandomMoveBot))
-    CulledListOfAllBots.append(BasicBot)
+    CulledListOfAllBots.append(BasicBot())
     
     random.shuffle(CulledListOfAllBots)
     return CulledListOfAllBots
