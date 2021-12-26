@@ -121,22 +121,20 @@ class NeuralNetworkPlayer(BasicBot):
             NewBoard = MovingAPiece(Move[0],Move[1],BoardDict,PiecesDict)
             Eval = float(self.Evaluate(NewBoard[0],NewBoard[1],Colour))
             Eval = round(Eval,2)
-    
             if Eval > BestEval:
                 BestMoves = [Move]
                 BestEval = Eval
             
             elif Eval == BestEval:
                 BestMoves.append(Move)
-        
+ 
         return random.choice(BestMoves)
 
     def Evaluate(self,BoardDict,PiecesDict,Colour):
-        WhiteInformation = [len(PiecesDict[Piece]) for Piece in WhitePieceNames] + [CheckingKingAttackers(BoardDict = BoardDict ,PieceDict = PiecesDict,Colour = "W")]
-        BlackInformation = [len(PiecesDict[Piece]) for Piece in BlackPieceNames] + [CheckingKingAttackers(BoardDict = BoardDict ,PieceDict = PiecesDict,Colour = "B")]
+        if Colour == "W":Input = [len(PiecesDict[Piece]) for Piece in BlackPieceNames]
+        else: Input = [len(PiecesDict[Piece]) for Piece in WhitePieceNames]
 
-        if Colour == "W":Input = WhiteInformation + BlackInformation
-        else: Input = BlackInformation + WhiteInformation
+        Input += [CheckingKingAttackers(BoardDict = BoardDict ,PieceDict = PiecesDict,Colour = "W"),CheckingKingAttackers(BoardDict = BoardDict ,PieceDict = PiecesDict,Colour = "B")][::(1 if Colour == "W" else -1)]       
 
         Evaluation = self.NeuralNetwork.Output(Input)
         return Evaluation

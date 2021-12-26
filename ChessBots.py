@@ -347,3 +347,10 @@ class Human(BasicBot):
                 print("That wasn't a valid Move")
                 if input("Do you want to keep moving" +  ColourDict.get(PieceName[0])+ " " + PieceNameDict.get(StartingPiece[1]) + "(y/n)") in ["Y","y"]:break
         
+class NothingBot(BasicBot):
+    def __init__(self):
+        BasicBot.__init__(self)
+    
+    def Move(self, BoardDict, PiecesDict,  Colour):
+        for King in PiecesDict[Colour+"K"]:
+            return (King,King)

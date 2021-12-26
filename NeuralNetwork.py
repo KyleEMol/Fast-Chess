@@ -47,7 +47,7 @@ class NeuralNetwork():
 
             for i in range(len(CurrentLayer)):
                 CurrentLayer[i] = ActivationFunction(CurrentLayer[i]+Bias)
-            
+        
         return CurrentLayer
 
     def MakingAnEvolvedNetwork(self):

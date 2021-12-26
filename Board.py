@@ -25,7 +25,6 @@ def BoardBoundsChecker(Position):
     Position = str(Position)
     return ((0<int(Position[0])<4) and (0<int(Position[1])<4) and (0<int(Position[2])<9) and (0<int(Position[3])<9))
 
-
 def FillingBoard(PiecesDict):
     BoardDict = {}
     
@@ -466,27 +465,24 @@ def ConvertingPosToCoords(Pos):
 
 def MovingAPiece(StartingSquare,FinalSquare,BoardDict,PiecesDict):
     PieceName = BoardDict[StartingSquare]
-
+    
     NewBoardDict = BoardDict.copy()
     NewPiecesDict = {}
     for Key in PiecesDict:
         NewPiecesDict[Key] = PiecesDict[Key].copy()
     
-    if not(NewBoardDict.get(FinalSquare)):
-        NewBoardDict[FinalSquare] = NewBoardDict[StartingSquare]
-        NewPiecesDict[PieceName].remove(StartingSquare)
-        NewPiecesDict[PieceName].add(FinalSquare)    
+    OpponentPiece =  NewBoardDict.get(FinalSquare)
+    if OpponentPiece != None:
+        if OpponentPiece[0] != PieceName[0]:
+            Opponent = NewBoardDict.get(FinalSquare)
+            NewPiecesDict[Opponent].remove(FinalSquare)
+        else:
+            print(PieceName,OpponentPiece)
 
-    else:
-        OpponentPiece = NewBoardDict[FinalSquare]
-        if PieceName[0] == OpponentPiece[0]:
-            return None
-
-        NewPiecesDict[OpponentPiece].remove(FinalSquare)
-        NewBoardDict[FinalSquare] = NewBoardDict[StartingSquare]
-        NewPiecesDict[PieceName].remove(StartingSquare)
-        NewPiecesDict[PieceName].add(FinalSquare)   
-            
+    NewPiecesDict[PieceName].remove(StartingSquare)
+    if PieceName[1] == "P" and str(FinalSquare)[2] == (8 if PieceName[1] == "B" else 0):PieceName = PieceName[0]+"Q"     
+    NewBoardDict[FinalSquare] = PieceName
+    NewPiecesDict[PieceName].add(FinalSquare)       
     NewBoardDict.pop(StartingSquare)
 
     return (NewBoardDict,NewPiecesDict)

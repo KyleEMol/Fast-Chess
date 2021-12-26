@@ -1,5 +1,7 @@
 from ChessBots import *
 from EvaluatorBots import *
+from KylesWeightings import *
+
 import pickle
 def RandomBot():
     Bot = random.choice(ListOfFilterBots)(random.choice(ListOfEvaluatorBots+ListOfDecisionBots))
