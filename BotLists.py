@@ -25,6 +25,7 @@ def CulledListOfBots():
 
     CulledListOfAllBots.append(Pacifist(RandomMoveBot))
     CulledListOfAllBots.append(BasicBot())
+    CulledListOfAllBots.append(KylesWeighting())
     
     random.shuffle(CulledListOfAllBots)
     return CulledListOfAllBots

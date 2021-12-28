@@ -10,9 +10,12 @@ class KylesWeighting(BasicBot):
         BestEval = -9999999
         BestMoves = []
 
+        SquaresOwnKingAttackedFrom = CheckingKingAttackedSquares(BoardDict = BoardDict ,PieceDict = PiecesDict,Colour = Colour)
+        WaysToAttackOppKing = CheckingWaysToAttackKings(BoardDict = BoardDict ,PieceDict = PiecesDict,Colour = Colour)
+
         for Move in LegalMoves:
             if BoardDict.get(Move[1],[None,None])[1] == "K":return Move
-            Eval = self.Evaluate(Move,BoardDict,PiecesDict,Colour)
+            Eval = self.Evaluate(Move,BoardDict,PiecesDict,Colour,SquaresOwnKingAttackedFrom,WaysToAttackOppKing)
 
             if Eval > BestEval:
                 BestEval = Eval
@@ -22,16 +25,20 @@ class KylesWeighting(BasicBot):
         
         return random.choice(BestMoves)
 
-    def Evaluate(self,Move,BoardDict,PiecesDict,Colour):
-        OppPiece = BoardDict[Move[1]]
+    def Evaluate(self,Move,BoardDict,PiecesDict,Colour,SquaresOwnKingAttackedFrom,WaysToAttackOppKing):
+        OppPieceName = BoardDict.get(Move[1],[None,None])[1]
+        OwnPieceName = BoardDict.get(Move[0])[1]
+
         PieceNames = ["P","R","N","B","Q","K" ]
-        OppPiece = [(0 if PieceNames[i] != OppPiece[1] else 1) for i in range(8)]
+        OppPiece = [0 for _ in range(6)]  
 
-        if Colour == "W":
-            OppKingAttacked,OwnKingAttacked = CheckingKingAttackers(BoardDict = BoardDict ,PieceDict = PiecesDict,Colour = "B"),CheckingKingAttackers(BoardDict = BoardDict ,PieceDict = PiecesDict,Colour = "W")
-        else:
-            OppKingAttacked,OwnKingAttacked = CheckingKingAttackers(BoardDict = BoardDict ,PieceDict = PiecesDict,Colour = "W"),CheckingKingAttackers(BoardDict = BoardDict ,PieceDict = PiecesDict,Colour = "B")
+        OwnPiece = [0 for _ in range(6)] 
+        OwnPiece[PieceNames.index(OwnPieceName)] = 1 
 
+        if OppPieceName:
+            OppPiece[PieceNames.index(OppPieceName)] = 1 
+        
+        
         OldZ = [0,0,0]
         NewZ = [0,0,0]
         OldW = [0,0,0]
@@ -56,54 +63,50 @@ class KylesWeighting(BasicBot):
         if Colour == "B":
             OldY = OldY[::-1]
             NewY = NewY[::-1]
+        
+        IsOpponentKingAttacked = False
+        if OwnPieceName == "B":
+            if Move[1] in WaysToAttackOppKing[1]:
+                IsOpponentKingAttacked = True
 
-        #OppPiece  + OwnKingAttacked + OpponentKingAttacked + before(Z + W + Y  dist from starting + X) + after(Z + W + Y  dist from starting + X)
-        Input = OppPiece + [OwnKingAttacked] + [OppKingAttacked] + OldZ + OldW + OldX + OldY + NewZ + NewW + NewX + NewY
-        Weights = [1,3,3,5,9,100000] + [-10000] + [9] + [0,2,0] + [0,2,0] + [1,2,3,4,4,3,2,1] + [0,0,1,2,3,3,4,5] + [0,2,0] + [0,2,0] + [1,2,3,4,4,3,2,1] + [0,0,1,2,3,3,4,5]
+        elif OwnPieceName == "N":
+            if Move[1] in WaysToAttackOppKing[0]:
+                IsOpponentKingAttacked = True
+
+        elif OwnPieceName == "R":
+            if Move[1] in WaysToAttackOppKing[2]:
+                IsOpponentKingAttacked = True
+
+        elif OwnPieceName == "Q":
+            if Move[1] in WaysToAttackOppKing[2] or Move[1] in WaysToAttackOppKing[1]:
+                IsOpponentKingAttacked = True
+        
+        elif OwnPieceName == "P":
+            if Move[1] in WaysToAttackOppKing[3]:
+                IsOpponentKingAttacked = True         
+
+        IsOwnKingAttacked = False
+
+        if len(SquaresOwnKingAttackedFrom)>0:
+            IsOwnKingAttacked = True
+            if Move[1] in SquaresOwnKingAttackedFrom:
+                IsOwnKingAttacked = False      
+            
+            if OwnPieceName == "K":
+                if Move[0] in SquaresOwnKingAttackedFrom:
+                    IsOwnKingAttacked = True
+                    if Move[1] not in SquaresOwnKingAttackedFrom:
+                        IsOwnKingAttacked = False
+
+
+        #OppPiece  + OwnKingAttacked + IsOpponentKingAttacked + before(Z + W + Y  dist from starting + X) + after(Z + W + Y  dist from starting + X)
+        Input = OwnPiece + OppPiece + [int(IsOwnKingAttacked)] + [int(IsOpponentKingAttacked)] + OldZ + OldW + OldX + OldY + NewZ + NewW + NewX + NewY
+        Weights = [0,-1,-1.5,-2.5,-3.5,-5]+ list(map((lambda x: x + 7),[1,3,3,5,9,100000])) + [-10000] + [3] + [0,-2,0] + [0,-2,0] + list(map((lambda x:x*0.5),[-3,-1,-4,-7,-7,-4,-1,-3])) + list(map((lambda x:x*0.5),[0,-1,-1,-3,-6,-6,-10,-15]))+ [0,2,0] + [0,2,0] + list(map((lambda x:x*0.5),[-2,1,4,7,7,4,1,-2])) + list(map((lambda x:x*0.5),[0,1,1,3,6,6,10,15]))
 
         Eval = 0 
         for i in range(len(Input)):
             Eval += Input[i] * Weights[i]
         
         return Eval
-
-    def BasicEvaluate(self,Move,BoardDict,PiecesDict,Colour):
-
-        #OppPiece  + OwnKingAttacked + OpponentKingAttacked+ +Z + W + Y + X
-        Input = [0,0,0,0,0,0] + [0] + [0] + [0,0,0] + [0,0,0] + [0,0,0,0,0,0,0,0] + [0,0,0,0,0,0,0,0]
-        Weights = [1,3,3,5,9,100000] + [-10000] + [9] + [0,2,0] + [0,2,0] + [1,2,3,4,4,3,2,1] + [0,0,1,2,3,3,4,5]
-        OwnPiece = BoardDict[Move[0]]
-        PiecesValDict = {None : 0,"P":1,"B":3,"N":3,"R":5,"Q":9,"K":100000}
-
-        OppPieceVal = PiecesValDict[BoardDict.get(Move[1],[None,None])[1]]
-
-
-        if Colour == "W":
-            OppKingAttacked,OwnKingAttacked = CheckingKingAttackers(BoardDict = BoardDict ,PieceDict = PiecesDict,Colour = "B"),CheckingKingAttackers(BoardDict = BoardDict ,PieceDict = PiecesDict,Colour = "W")
-        else:
-            OppKingAttacked,OwnKingAttacked = CheckingKingAttackers(BoardDict = BoardDict ,PieceDict = PiecesDict,Colour = "W"),CheckingKingAttackers(BoardDict = BoardDict ,PieceDict = PiecesDict,Colour = "B")
-
-
-        ExtraDWeights = [0,2,0]
-        XWeights = [1,2,3,4,4,3,2,1]
-        YWeights = [0,0,1,2,3,3,4,5][::-1 if Colour == "B" else 1]
-
-        if OwnPiece[1] == "K":
-            ExtraDWeights = [3 - X for X in ExtraDWeights]
-            XWeights = [2 - X for X in XWeights]
-            YWeights = [2 - X for X in YWeights]
-
-        TMove = str(Move[0])
-        OldPositionalVal = ExtraDWeights[int(TMove[0])-1]+ExtraDWeights[int(TMove[1])-1]+YWeights[int(TMove[2])-1] + XWeights[int(TMove[3])-1]
-        TMove = str(Move[1])
-        NewPositionalVal = ExtraDWeights[int(TMove[0])-1]+ExtraDWeights[int(TMove[1])-1]+YWeights[int(TMove[2])-1] + XWeights[int(TMove[3])-1]
-        
-
-        Eval = (OppPieceVal + (NewPositionalVal - OldPositionalVal)/10 + OppKingAttacked*1000) - ( OwnKingAttacked * 10000)
-
-        return Eval
-
-
-
 
 
