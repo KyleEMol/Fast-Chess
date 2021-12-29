@@ -8,4 +8,5 @@ from KylesWeightings import *
 #random.seed(2)
 #FindingEloOfABot(KylesWeighting())
 #EternalTournament(CulledListOfBots())
-EternalNeuralNetworkTournament(AIPerGen = 20)
+#EternalNeuralNetworkTournament(AIPerGen = 20)
+EternalTournamentWithAI(CulledListOfBots())

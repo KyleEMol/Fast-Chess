@@ -85,6 +85,7 @@ def EternalNeuralNetworkTournament(AIPerGen=20,NumberOfGamesPerMatch = 2,NumberO
 
         DictOfAI = {Player.Name:Player.Rating for Player in ListOfAI}
         DictOfAI["NumberOfRounds"] = NumberOfRounds
+        for AI in ListOfAI:AI.Rating = 1000
         
         with open('ListOfAI', 'wb') as f:pickle.dump(ListOfAI,f)
  

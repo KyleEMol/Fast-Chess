@@ -219,3 +219,45 @@ def FindingEloOfABot(Bot,ListOfOpponents = CulledListOfBots(),NumberOfGamesPerMa
             writer.writerow(["NumberOfRounds",DictOfPlayers["NumberOfRounds"]])
             for Player in sorted(ListOfOpponents + [Bot],key=(lambda X:DictOfPlayers[X.Name]),reverse=True):
                 writer.writerow([Player.Name,DictOfPlayers[Player.Name]])
+
+def EternalTournamentWithAI(ListOfPlayers = ListOfEveryBot(),NumberOfGamesPerMatch = 3):
+    ListOfPlayers = GettingBotEloForList(ListOfPlayers)
+    with open('ListOfAI', 'rb') as f:
+        ListOfAI = pickle.load(f)
+    
+    ListOfPlayers += ListOfAI
+    NumberOfRounds = 0
+    with open('TournamentResults.csv', newline='') as csvfile:
+        reader = csv.reader(csvfile, delimiter=',', quotechar='|')
+
+        for row in reader:
+            if len(row) == 0:continue
+            
+            if row[0] == "NumberOfRounds":
+                NumberOfRounds = int(row[1])
+                break
+
+    while True:
+        random.shuffle(ListOfPlayers)
+        for Player1 in ListOfPlayers:
+            Player2 = random.choice(ListOfPlayers)
+            TwoPlayers = [Player1,Player2]
+            for _ in range(NumberOfGamesPerMatch):
+                random.shuffle(TwoPlayers)
+                RatedGame(TwoPlayers[0], TwoPlayers[1])
+
+        NumberOfRounds += 1
+        print(f"Round Number : {NumberOfRounds}")
+        ListOfPlayers.sort(key=(lambda x:x.Rating), reverse=True)
+        DictOfPlayers = {Player.Name:Player.Rating for Player in ListOfPlayers}
+        DictOfPlayers["NumberOfRounds"] = NumberOfRounds
+        
+        with open('TournamentResultsDict', 'wb') as f:
+            pickle.dump(DictOfPlayers,f)
+
+        with open('TournamentResults.csv', "w") as f:
+            writer = csv.writer(f)
+            writer.writerow(["PlayerName","PlayerRating"])
+            writer.writerow(["NumberOfRounds",NumberOfRounds])
+            for Player in ListOfPlayers:
+                writer.writerow([Player.Name,Player.Rating])
