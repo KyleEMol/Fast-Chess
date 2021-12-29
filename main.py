@@ -5,8 +5,7 @@ from EvaluatorBots import *
 from NeuralNetworkTournament import *
 from KylesWeightings import *
 
-random.seed(2)
-DisplayGame(KylesWeighting(),BasicBot())
+#random.seed(2)
 #FindingEloOfABot(KylesWeighting())
-EternalTournament(CulledListOfBots())
-#EternalNeuralNetworkTournament()
+#EternalTournament(CulledListOfBots())
+EternalNeuralNetworkTournament(AIPerGen = 20)

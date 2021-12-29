@@ -159,10 +159,13 @@ def EternalTournament(ListOfPlayers = ListOfEveryBot(),NumberOfGamesPerMatch = 3
                 break
 
     while True:
+        random.shuffle(ListOfPlayers)
         for Player1 in ListOfPlayers:
             Player2 = random.choice(ListOfPlayers)
+            TwoPlayers = [Player1,Player2]
             for _ in range(NumberOfGamesPerMatch):
-                RatedGame(Player1, Player2)
+                random.shuffle(TwoPlayers)
+                RatedGame(TwoPlayers[0], TwoPlayers[1])
 
         NumberOfRounds += 1
         print(f"Round Number : {NumberOfRounds}")

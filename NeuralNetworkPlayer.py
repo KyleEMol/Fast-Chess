@@ -217,14 +217,13 @@ class NeuralNetworkPlayer(BasicBot):
     def __init__(self,FilterBot = NoFilter(None),Name = "NeuralNetwork"):
         BasicBot.__init__(self)
         self.Name = Name
-        self.NeuralNetwork = NeuralNetwork(Layout = [62,62,62,16,1])
+        self.NeuralNetwork = NeuralNetwork(Layout = [58,58,58,14,1])
         self.FilterBot = FilterBot
 
     def Move(self,BoardDict ,PiecesDict, Colour):
         LegalMoves = self.FilterBot.Move(BoardDict,PiecesDict,Colour)
         BestEval = -9999999
         BestMoves = []
-
         SquaresOwnKingAttackedFrom = CheckingKingAttackedSquares(BoardDict = BoardDict ,PieceDict = PiecesDict,Colour = Colour)
         WaysToAttackOppKing = CheckingWaysToAttackKings(BoardDict = BoardDict ,PieceDict = PiecesDict,Colour = Colour)
 
@@ -237,7 +236,6 @@ class NeuralNetworkPlayer(BasicBot):
                 BestMoves = [Move]
             elif Eval == BestEval:
                 BestMoves.append(Move)
-        
         return random.choice(BestMoves)
 
     def Evaluate(self,Move,BoardDict,PiecesDict,Colour,SquaresOwnKingAttackedFrom,WaysToAttackOppKing):
@@ -247,12 +245,11 @@ class NeuralNetworkPlayer(BasicBot):
         PieceNames = ["P","R","N","B","Q","K" ]
         OppPiece = [0 for _ in range(6)]  
 
-        OwnPiece = [0 for _ in range(6)] 
+        OwnPiece = OppPiece[:]
         OwnPiece[PieceNames.index(OwnPieceName)] = 1 
 
         if OppPieceName:
             OppPiece[PieceNames.index(OppPieceName)] = 1 
-        
         
         OldZ = [0,0,0]
         NewZ = [0,0,0]
@@ -318,7 +315,7 @@ class NeuralNetworkPlayer(BasicBot):
         Input = OwnPiece + OppPiece + [int(IsOwnKingAttacked)] + [int(IsOpponentKingAttacked)] + OldZ + OldW + OldX + OldY + NewZ + NewW + NewX + NewY
         #Weights = [0,-1,-1.5,-2.5,-3.5,-5]+ list(map((lambda x: x + 7),[1,3,3,5,9,100000])) + [-10000] + [3] + [0,-2,0] + [0,-2,0] + list(map((lambda x:x*0.5),[-3,-1,-4,-7,-7,-4,-1,-3])) + list(map((lambda x:x*0.5),[0,-1,-1,-3,-6,-6,-10,-15]))+ [0,2,0] + [0,2,0] + list(map((lambda x:x*0.5),[-2,1,4,7,7,4,1,-2])) + list(map((lambda x:x*0.5),[0,1,1,3,6,6,10,15]))
 
-        Evaluation = self.NeuralNetwork.Output(Input)
+        Evaluation = round(float(self.NeuralNetwork.Output(Input)),2)
         return Evaluation
 
     def Evolve(self):

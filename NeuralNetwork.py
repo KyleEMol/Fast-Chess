@@ -46,6 +46,8 @@ class NeuralNetwork():
             CurrentLayer = np.dot(CurrentLayer,Weight)
 
             for i in range(len(CurrentLayer)):
+                if len(CurrentLayer) == 1:
+                    break
                 CurrentLayer[i] = ActivationFunction(CurrentLayer[i]+Bias)
         
         return CurrentLayer

@@ -1,13 +1,14 @@
 from Game import *
 from NeuralNetworkPlayer import *
+from KylesWeightings import *
 
 def EternalNeuralNetworkTournament(AIPerGen=20,NumberOfGamesPerMatch = 2,NumberOfMatches = 3):
     
-    ListOfHardCodedBots = GettingBotEloForList([WarmongerBot(BountyHunter),BishopBudger(BountyHunter),WarmongerBot(ComparingCollectorBot),NoFilter(BountyHunter),BasicBot()])
+    #ListOfHardCodedBots = GettingBotEloForList([WarmongerBot(BountyHunter),BishopBudger(BountyHunter),WarmongerBot(ComparingCollectorBot),KylesWeighting(),BasicBot()])
     
     try:
-        with open('ListOfAIDict', 'rb') as f:
-            ListOfAI = pickle.read(f)
+        with open('ListOfAI', 'rb') as f:
+            ListOfAI = pickle.load(f)
     except FileNotFoundError:
         ListOfAI = []    
 
@@ -23,9 +24,11 @@ def EternalNeuralNetworkTournament(AIPerGen=20,NumberOfGamesPerMatch = 2,NumberO
                 
                 if row[0] == "NumberOfRounds":
                     NumberOfRounds = int(row[1])
+
                 if row[0] == "NumberOfAI":
                     NumberOfAI = int(row[1])
                     break
+
 
     except FileNotFoundError:
         NumberOfAI = 0
@@ -41,36 +44,50 @@ def EternalNeuralNetworkTournament(AIPerGen=20,NumberOfGamesPerMatch = 2,NumberO
         while len(ListOfAI) < AIPerGen:
             NewAI = random.choice(original).Evolve()
             NewAI.Name = "NeuralNetwork" + str(NumberOfAI)
-            ListOfAI.append()
+            ListOfAI.append(NewAI)
             NumberOfAI += 1 
 
-    ListOfPlayers = ListOfAI + ListOfHardCodedBots[:]
-
     while True:
+        Time = time.perf_counter()
+        original = ListOfAI[:]
         while len(ListOfAI) < AIPerGen:
             NewAI = random.choice(original).Evolve()
             NewAI.Name = "NeuralNetwork" + str(NumberOfAI)
-            ListOfAI.append()
+            ListOfAI.append(NewAI)
             NumberOfAI += 1 
         
-        ListOfPlayers = ListOfAI + ListOfHardCodedBots[:]
-
-        for _ in range(NumberOfMatches):
-            for Player1 in ListOfPlayers:
-                Player2 = random.choice(ListOfPlayers)
+        for Player1 in ListOfAI:
+            for _ in range(NumberOfMatches-1):
+                Player2 = random.choice(ListOfAI)
+                TwoPlayers = [Player1,Player2]
                 for _ in range(NumberOfGamesPerMatch):
-                    RatedGame(Player1, Player2)
+                    random.shuffle(TwoPlayers)
+                    RatedGame(TwoPlayers[0], TwoPlayers[1])
+
+            Player2 = KylesWeighting()
+            TwoPlayers = [Player1,Player2]
+            for _ in range(3):
+                random.shuffle(TwoPlayers)
+                RatedGame(TwoPlayers[0], TwoPlayers[1])
+            
+            with open('ListOfAI', 'wb') as f:pickle.dump(ListOfAI,f)
+
 
         NumberOfRounds += 1
         print(f"Round Number : {NumberOfRounds}")
+        print(time.perf_counter()-Time)
         ListOfAI.sort(key=(lambda x:x.Rating), reverse=True)
-        ListOfAI = ListOfAI[:6]
+
+        i = 3
+        while ListOfAI[i].Rating > 1000 and len(ListOfAI)<7:
+            i += 1
+        ListOfAI = ListOfAI[:i]
+
         DictOfAI = {Player.Name:Player.Rating for Player in ListOfAI}
         DictOfAI["NumberOfRounds"] = NumberOfRounds
         
-        with open('ListOfAI', 'wb') as f:
-            pickle.dump(ListOfAI,f)
-
+        with open('ListOfAI', 'wb') as f:pickle.dump(ListOfAI,f)
+ 
         with open('AITournamentResults.csv', "w") as f:
             writer = csv.writer(f)
             writer.writerow(["PlayerName","PlayerRating"])

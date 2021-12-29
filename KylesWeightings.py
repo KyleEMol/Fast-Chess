@@ -110,3 +110,218 @@ class KylesWeighting(BasicBot):
         return Eval
 
 
+from NeuralNetwork import *
+from EvaluatorBots import *
+
+WhitePieceNames = ["WP","WR","WN","WB","WQ","WK" ] 
+BlackPieceNames = ["BP","BR","BN","BB","BQ","BK" ]
+
+
+def FindingIfKightIsAttacking(BoardDict=dict,Pos = int,Colour = str):
+    KnightName = "WN" if Colour == "B" else "BN"
+    YU, YD, XL, XR, WU, WD, ZL, ZR = 10,-10,1,-1,100,-100,1000,-1000
+
+    KnightLocations = set([])
+
+    for Direction in [YU, YD, XL, XR, WU, WD, ZL, ZR]:
+        for Direction2 in [YU, YD, XL, XR, WU, WD, ZL, ZR]:
+            if Direction + Direction2 == 0 or Direction == Direction2:continue
+            Diff = Direction + (Direction2 * 2)
+
+            if BoardBoundsChecker(Pos + Diff):
+                if BoardDict.get(Pos+Diff) == KnightName:
+                    KnightLocations.add(Pos+Diff)
+                    return KnightLocations
+    
+    return KnightLocations
+
+def FindingIfFileIsAttacked(BoardDict=dict,Pos = int,Colour = str):
+    OppositeColour = "W" if Colour == "B" else "B"
+
+    YU, YD, XL, XR, WU, WD, ZL, ZR = 10,-10,1,-1,100,-100,1000,-1000
+
+    FileAttackers = set([])
+
+    for Direction in [YU, YD, XL, XR, WU, WD, ZL, ZR]:
+        LoopNum = 1 
+        Diff = Direction
+        while BoardBoundsChecker(Pos + Diff):
+            TempMoves = set([])
+            Diff = LoopNum*Direction
+            LoopNum += 1
+            if BoardDict.get(Pos+Diff) == None:
+                TempMoves.add(Pos+Diff)
+                continue
+
+            if BoardDict.get(Pos+Diff)[0] == OppositeColour:
+                if BoardDict.get(Pos+Diff)[1] == "R" or "Q":
+                    TempMoves.add(Pos+Diff)
+                    FileAttackers.update(TempMoves)
+                    return FileAttackers
+
+            break
+
+    return FileAttackers
+
+def FindingIfDiagonalIsAttacked(BoardDict=dict,Pos = int,Colour = str):
+    OppositeColour = "W" if Colour == "B" else "B"
+
+    YU, YD, XL, XR, WU, WD, ZL, ZR = 10,-10,1,-1,100,-100,1000,-1000
+
+    DiagonalAttackers = set([])
+
+    for Direction in [YU, YD, XL, XR, WU, WD, ZL, ZR]:
+        for Direction2 in [YU, YD, XL, XR, WU, WD, ZL, ZR]:
+            if Direction + Direction2 == 0 or Direction == Direction2:continue
+            Diff = Direction + Direction2
+            LoopNum = 1 
+            TempMoves = set([])
+
+            while BoardBoundsChecker(Pos + Diff): 
+                Diff = LoopNum*Direction
+                LoopNum += 1 
+
+                if BoardDict.get(Pos+Diff) == None:
+                    TempMoves.add(Pos+Diff)
+                    continue
+
+                if BoardDict.get(Pos+Diff)[0] == OppositeColour:
+                    if BoardDict.get(Pos+Diff)[1] == "B" or "Q":
+                        TempMoves.add(Pos+Diff)
+                        DiagonalAttackers.update(TempMoves)
+                        return DiagonalAttackers
+                break
+
+    return DiagonalAttackers
+
+def CheckingIfPawnIsAttacking(BoardDict=dict,Pos = int,Colour = str):
+    OppositeColour = "W" if Colour == "B" else "B"
+
+    PawnAttacks = set([])
+    YU, YD, XL, XR, WU, WD, ZL, ZR = 10,-10,1,-1,100,-100,1000,-1000
+    LegalDirections = [YU] if OppositeColour == "B" else [YD]
+    LegalDirections += [WU, WD, ZL, ZR]
+    
+    AttackingDirections = LegalDirections + [XL,XR]
+    for Direction in AttackingDirections:
+        for Direction2 in AttackingDirections:
+            if Direction + Direction2 == 0 or Direction == Direction2:continue
+
+            if BoardDict.get(Direction+Direction2+Pos) == OppositeColour +"P":
+                PawnAttacks.add((Direction+Direction2+Pos))
+                return PawnAttacks
+
+    return PawnAttacks
+
+def CheckingIfPieceIsAttacked(BoardDict = dict ,PieceLocation = int,Colour = str):
+    ListOfFindingFuncs = [FindingIfDiagonalIsAttacked,FindingIfFileIsAttacked,FindingIfKightIsAttacking,CheckingIfPawnIsAttacking]
+    Output = set([])
+    for Func in ListOfFindingFuncs:
+        Result =  Func(BoardDict = BoardDict,Pos = PieceLocation,Colour = Colour)
+        if Result:
+            return Result
+    return Output
+
+def CheckingKingAttackedSquares(BoardDict = dict ,PieceDict = dict,Colour = str):
+    for King in PieceDict[Colour+"K"]:
+        TempResults = CheckingIfPieceIsAttacked(BoardDict = BoardDict ,PieceLocation = King,Colour = Colour)
+        if TempResults:
+            TempResults.add(King)
+            return TempResults
+    
+    return set([])
+
+def CheckingWaysToAttackWithKnight(BoardDict=dict,Pos = int,Colour = str):
+    PlacesToAttackFrom = set([])
+    YU, YD, XL, XR, WU, WD, ZL, ZR = 10,-10,1,-1,100,-100,1000,-1000
+
+    for Direction in [YU, YD, XL, XR, WU, WD, ZL, ZR]:
+        for Direction2 in [YU, YD, XL, XR, WU, WD, ZL, ZR]:
+            if Direction + Direction2 == 0 or Direction == Direction2:continue
+            Diff = Direction + (Direction2 * 2)
+
+            if BoardBoundsChecker(Pos + Diff):
+                if BoardDict.get(Pos+Diff) != None:
+                    if BoardDict.get(Pos+Diff)[0] != Colour:
+                        PlacesToAttackFrom.add(Pos+Diff) 
+    
+    return PlacesToAttackFrom
+
+def CheckingHowToAttackFiles(BoardDict=dict,Pos = int,Colour = str):
+    YU, YD, XL, XR, WU, WD, ZL, ZR = 10,-10,1,-1,100,-100,1000,-1000
+
+    PlacesToAttackFrom = set([])
+
+    for Direction in [YU, YD, XL, XR, WU, WD, ZL, ZR]:
+        LoopNum = 1 
+        Diff = Direction
+        while BoardBoundsChecker(Pos + Diff):
+            Diff = LoopNum*Direction
+            LoopNum += 1
+            if BoardDict.get(Pos+Diff) == None:
+                PlacesToAttackFrom.add(Pos+Diff)
+                continue
+
+            if BoardDict.get(Pos+Diff)[0] != Colour:
+                PlacesToAttackFrom.add(Pos+Diff)
+
+            break
+
+    return PlacesToAttackFrom
+
+def CheckingHowToAttackDiagonals(BoardDict=dict,Pos = int,Colour = str):
+    YU, YD, XL, XR, WU, WD, ZL, ZR = 10,-10,1,-1,100,-100,1000,-1000
+
+    PlacesToAttackFrom = set([])
+
+    for Direction in [YU, YD, XL, XR, WU, WD, ZL, ZR]:
+        for Direction2 in [YU, YD, XL, XR, WU, WD, ZL, ZR]:
+            if Direction + Direction2 == 0 or Direction == Direction2:continue
+            Diff = Direction + Direction2
+            LoopNum = 1 
+
+            while BoardBoundsChecker(Pos + Diff): 
+                Diff = LoopNum*Direction
+                LoopNum += 1 
+
+                if BoardDict.get(Pos+Diff) == None:
+                    PlacesToAttackFrom.add(Pos+Diff)
+                    continue
+
+                if BoardDict.get(Pos+Diff)[0] != Colour:
+                    if BoardDict.get(Pos+Diff)[1] == "B" or "Q":
+                        PlacesToAttackFrom.add(Pos+Diff)
+                break
+
+    return PlacesToAttackFrom
+
+def CheckingWaysToAttackWithPawn(BoardDict=dict,Pos = int,Colour = str):
+
+    PlacesToAttackFrom = set([])
+    YU, YD, XL, XR, WU, WD, ZL, ZR = 10,-10,1,-1,100,-100,1000,-1000
+    LegalDirections = [YU] if Colour == "W" else [YD]
+    LegalDirections += [WU, WD, ZL, ZR]
+    
+    AttackingDirections = LegalDirections + [XL,XR]
+    for Direction in AttackingDirections:
+        for Direction2 in AttackingDirections:
+            if Direction + Direction2 == 0 or Direction == Direction2:continue
+
+            if BoardDict.get(Direction+Direction2+Pos) == "W" if Colour == "B" else "B" +"P":
+                PlacesToAttackFrom.add((Direction+Direction2+Pos))
+
+    return PlacesToAttackFrom
+
+def CheckingWaysToAttackKings(BoardDict = dict ,PieceDict = dict,Colour = str):
+    WaysToAttackKings = [set([]) for _ in range(4)]
+    ListOfFindingFuncs = [CheckingWaysToAttackWithKnight,CheckingHowToAttackFiles,CheckingHowToAttackDiagonals,CheckingWaysToAttackWithPawn]
+
+    for King in PieceDict[Colour+"K"]:
+        i = 0
+        for Func in ListOfFindingFuncs:
+            WaysToAttackKings[i].update(Func(BoardDict=BoardDict,Pos = King,Colour = Colour))
+            i += 1
+    
+    return WaysToAttackKings
+
+
