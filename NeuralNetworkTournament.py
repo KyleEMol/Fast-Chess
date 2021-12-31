@@ -48,13 +48,15 @@ def EternalNeuralNetworkTournament(AIPerGen=20,NumberOfGamesPerMatch = 2,NumberO
             NumberOfAI += 1 
 
     while True:
-        Time = time.perf_counter()
+        RoundTime = time.perf_counter()
         original = ListOfAI[:]
         while len(ListOfAI) < AIPerGen:
             NewAI = random.choice(original).Evolve()
             NewAI.Name = "NeuralNetwork" + str(NumberOfAI)
             ListOfAI.append(NewAI)
             NumberOfAI += 1 
+
+        for AI in ListOfAI:AI.Rating = 1000        
         
         for Player1 in ListOfAI:
             for _ in range(NumberOfMatches-1):
@@ -66,29 +68,28 @@ def EternalNeuralNetworkTournament(AIPerGen=20,NumberOfGamesPerMatch = 2,NumberO
 
             Player2 = KylesWeighting()
             TwoPlayers = [Player1,Player2]
+            Time = time.perf_counter()
             for _ in range(3):
                 random.shuffle(TwoPlayers)
                 RatedGame(TwoPlayers[0], TwoPlayers[1])
             
-            with open('ListOfAI', 'wb') as f:pickle.dump(ListOfAI,f)
+            Player1.TotalGameTime += time.perf_counter() - Time
+            Player1.GamesPlayed += 3
+
+            with open('ListOfAI', 'wb') as f:
+                pickle.dump(ListOfAI,f)
 
 
         NumberOfRounds += 1
         print(f"Round Number : {NumberOfRounds}")
-        print(time.perf_counter()-Time)
-        ListOfAI.sort(key=(lambda x:x.Rating), reverse=True)
+        print(time.perf_counter()-RoundTime)
+        ListOfAI.sort(key=(lambda x:x.Fitness()), reverse=True)
 
         i = 3
-        while ListOfAI[i].Rating > 1000 and len(ListOfAI)<7:
+        while ListOfAI[i].Fitness() > 1000 and len(ListOfAI)<7:
             i += 1
         ListOfAI = ListOfAI[:i]
 
-        DictOfAI = {Player.Name:Player.Rating for Player in ListOfAI}
-        DictOfAI["NumberOfRounds"] = NumberOfRounds
-        for AI in ListOfAI:AI.Rating = 1000
-        
-        with open('ListOfAI', 'wb') as f:pickle.dump(ListOfAI,f)
- 
         with open('AITournamentResults.csv', "w") as f:
             writer = csv.writer(f)
             writer.writerow(["PlayerName","PlayerRating"])
@@ -96,3 +97,11 @@ def EternalNeuralNetworkTournament(AIPerGen=20,NumberOfGamesPerMatch = 2,NumberO
             writer.writerow(["NumberOfAI",NumberOfAI])
             for Player in ListOfAI:
                 writer.writerow([Player.Name,Player.Rating])
+        
+        with open('ListOfAI', 'wb') as f:pickle.dump(ListOfAI,f)
+        
+        if NumberOfRounds%10 == 0 :
+            AverageRating = sum([AI.Rating for AI in ListOfAI])/len(ListOfAI)
+            AverageTimeTaken = sum([(AI.TotalGameTime / AI.GamesPlayed) for AI in ListOfAI])/len(ListOfAI)
+            TList = [AverageRating,AverageTimeTaken] + ListOfAI
+            with open('ListOfAIRound'+str(NumberOfRounds), 'wb') as f:pickle.dump(TList,f)

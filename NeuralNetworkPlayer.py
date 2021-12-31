@@ -219,8 +219,13 @@ class NeuralNetworkPlayer(BasicBot):
         self.Name = Name
         self.NeuralNetwork = NeuralNetwork(Layout = [58,58,58,14,1])
         self.FilterBot = FilterBot
+        self.TotalGameTime, self.GamesPlayed = 0,0
 
-    def Move(self,BoardDict ,PiecesDict, Colour):
+    def Fitness(self):
+        return self.Rating + (10 - self.TotalGameTime/self.GamesPlayed)
+
+    def Move(self,BoardDict ,PiecesDict, Colour): 
+
         LegalMoves = self.FilterBot.Move(BoardDict,PiecesDict,Colour)
         BestEval = -9999999
         BestMoves = []
@@ -236,6 +241,7 @@ class NeuralNetworkPlayer(BasicBot):
                 BestMoves = [Move]
             elif Eval == BestEval:
                 BestMoves.append(Move)
+ 
         return random.choice(BestMoves)
 
     def Evaluate(self,Move,BoardDict,PiecesDict,Colour,SquaresOwnKingAttackedFrom,WaysToAttackOppKing):

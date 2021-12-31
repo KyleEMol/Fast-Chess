@@ -224,7 +224,7 @@ def EternalTournamentWithAI(ListOfPlayers = ListOfEveryBot(),NumberOfGamesPerMat
     ListOfPlayers = GettingBotEloForList(ListOfPlayers)
     with open('ListOfAI', 'rb') as f:
         ListOfAI = pickle.load(f)
-        for AI in ListOfAI:AI.RAting = 1000
+        for AI in ListOfAI:AI.Rating = 1000
     
     ListOfPlayers += ListOfAI
     NumberOfRounds = 0
