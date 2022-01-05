@@ -1,71 +1,142 @@
-PlayerName,PlayerRating
-NumberOfRounds,201
-NoFilter ComparingCollectorBot,1449.29
-NoFilter BountyHunter,1414.06
-WarmongerBot ComparingCollectorBot,1404.47
-BishopBudger ComparingCollectorBot,1395.16
-WarmongerBot BountyHunter,1385.25
-QueenQuarreler ComparingCollectorBot,1367.32
-KnightKnocker BountyHunter,1350.14
-KnightKnocker ComparingCollectorBot,1347.41
-WarmongerBot ComparingHoarderBot,1340.98
-NoFilter ComparingHoarderBot,1340.47
-BishopBudger BountyHunter,1323.77
-WarmongerBot HoarderEvaluatorBot,1282.86
-WarmongerBot CollectorEvaluatorBot,1268.14
-WarmongerBot RandomMoveBot,1221.4
-KylesWeighting,1184.5
-QueenQuarreler BountyHunter,1179.59
-PawnPusher BountyHunter,1169.19
-PawnPusher ComparingCollectorBot,1139.16
-KnightKnocker ComparingHoarderBot,1109.18
-QueenQuarreler ComparingHoarderBot,1103.81
-BishopBudger ComparingHoarderBot,1101.66
-NeuralNetwork816,1090.66
-PawnPusher ComparingHoarderBot,1078.0
-NoFilter Bully,1073.21
-NeuralNetwork817,1061.86
-WarmongerBot Bully,1050.06
-NeuralNetwork815,1041.9
-RookRelocator ComparingCollectorBot,1030.86
-PawnPusher Bully,1006.22
-RookRelocator BountyHunter,966.63
-BishopBudger Bully,940.81
-KingKicker ComparingCollectorBot,924.09
-RookRelocator ComparingHoarderBot,887.19
-KingKicker ComparingHoarderBot,815.75
-KnightKnocker CollectorEvaluatorBot,812.94
-BishopBudger CollectorEvaluatorBot,812.23
-ChampionBot ComparingCollectorBot,804.9
-KnightKnocker Bully,803.53
-BishopBudger RandomMoveBot,777.88
-KingKicker BountyHunter,774.5
-KnightKnocker HoarderEvaluatorBot,766.89
-QueenQuarreler HoarderEvaluatorBot,761.8
-BishopBudger HoarderEvaluatorBot,735.08
-QueenQuarreler RandomMoveBot,722.37
-KingKicker Bully,718.92
-QueenQuarreler Bully,711.37
-ChampionBot BountyHunter,709.1
-RookRelocator Bully,698.67
-QueenQuarreler CollectorEvaluatorBot,675.6
-KnightKnocker RandomMoveBot,664.69
-KingKicker RandomMoveBot,646.62
-RookRelocator HoarderEvaluatorBot,644.01
-RookRelocator CollectorEvaluatorBot,642.53
-KingKicker CollectorEvaluatorBot,641.97
-KingKicker HoarderEvaluatorBot,624.77
-ChampionBot ComparingHoarderBot,603.5
-PawnPusher CollectorEvaluatorBot,601.0
-NoFilter CollectorEvaluatorBot,599.47
-PawnPusher RandomMoveBot,598.08
-RookRelocator RandomMoveBot,579.53
-ChampionBot Bully,565.55
-PawnPusher HoarderEvaluatorBot,560.92
-NoFilter HoarderEvaluatorBot,543.31
-NoFilter RandomMoveBot,475.27
-ChampionBot CollectorEvaluatorBot,444.12
-ChampionBot HoarderEvaluatorBot,440.0
-ChampionBot RandomMoveBot,408.1
-Pacifist RandomMoveBot,405.34
-BasicBot,395.34
+PlayerName,PlayerRating
+
+NumberOfRounds,201
+
+NoFilter ComparingCollectorBot,1449.29
+
+NoFilter BountyHunter,1414.06
+
+WarmongerBot ComparingCollectorBot,1404.47
+
+BishopBudger ComparingCollectorBot,1395.16
+
+WarmongerBot BountyHunter,1385.25
+
+QueenQuarreler ComparingCollectorBot,1367.32
+
+KnightKnocker BountyHunter,1350.14
+
+KnightKnocker ComparingCollectorBot,1347.41
+
+WarmongerBot ComparingHoarderBot,1340.98
+
+NoFilter ComparingHoarderBot,1340.47
+
+BishopBudger BountyHunter,1323.77
+
+WarmongerBot HoarderEvaluatorBot,1282.86
+
+WarmongerBot CollectorEvaluatorBot,1268.14
+
+WarmongerBot RandomMoveBot,1221.4
+
+KylesWeighting,1184.5
+
+QueenQuarreler BountyHunter,1179.59
+
+PawnPusher BountyHunter,1169.19
+
+PawnPusher ComparingCollectorBot,1139.16
+
+KnightKnocker ComparingHoarderBot,1109.18
+
+QueenQuarreler ComparingHoarderBot,1103.81
+
+BishopBudger ComparingHoarderBot,1101.66
+
+NeuralNetwork816,1090.66
+
+PawnPusher ComparingHoarderBot,1078.0
+
+NoFilter Bully,1073.21
+
+NeuralNetwork817,1061.86
+
+WarmongerBot Bully,1050.06
+
+NeuralNetwork815,1041.9
+
+RookRelocator ComparingCollectorBot,1030.86
+
+PawnPusher Bully,1006.22
+
+RookRelocator BountyHunter,966.63
+
+BishopBudger Bully,940.81
+
+KingKicker ComparingCollectorBot,924.09
+
+RookRelocator ComparingHoarderBot,887.19
+
+KingKicker ComparingHoarderBot,815.75
+
+KnightKnocker CollectorEvaluatorBot,812.94
+
+BishopBudger CollectorEvaluatorBot,812.23
+
+ChampionBot ComparingCollectorBot,804.9
+
+KnightKnocker Bully,803.53
+
+BishopBudger RandomMoveBot,777.88
+
+KingKicker BountyHunter,774.5
+
+KnightKnocker HoarderEvaluatorBot,766.89
+
+QueenQuarreler HoarderEvaluatorBot,761.8
+
+BishopBudger HoarderEvaluatorBot,735.08
+
+QueenQuarreler RandomMoveBot,722.37
+
+KingKicker Bully,718.92
+
+QueenQuarreler Bully,711.37
+
+ChampionBot BountyHunter,709.1
+
+RookRelocator Bully,698.67
+
+QueenQuarreler CollectorEvaluatorBot,675.6
+
+KnightKnocker RandomMoveBot,664.69
+
+KingKicker RandomMoveBot,646.62
+
+RookRelocator HoarderEvaluatorBot,644.01
+
+RookRelocator CollectorEvaluatorBot,642.53
+
+KingKicker CollectorEvaluatorBot,641.97
+
+KingKicker HoarderEvaluatorBot,624.77
+
+ChampionBot ComparingHoarderBot,603.5
+
+PawnPusher CollectorEvaluatorBot,601.0
+
+NoFilter CollectorEvaluatorBot,599.47
+
+PawnPusher RandomMoveBot,598.08
+
+RookRelocator RandomMoveBot,579.53
+
+ChampionBot Bully,565.55
+
+PawnPusher HoarderEvaluatorBot,560.92
+
+NoFilter HoarderEvaluatorBot,543.31
+
+NoFilter RandomMoveBot,475.27
+
+ChampionBot CollectorEvaluatorBot,444.12
+
+ChampionBot HoarderEvaluatorBot,440.0
+
+ChampionBot RandomMoveBot,408.1
+
+Pacifist RandomMoveBot,405.34
+
+BasicBot,395.34
+

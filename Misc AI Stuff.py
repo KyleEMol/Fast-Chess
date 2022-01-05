@@ -1,4 +1,5 @@
 from NeuralNetworkTournament import *
+from BotLists import *
 
 def UpdatingTheAI():
     with open('ListOfAI', 'rb') as f:
@@ -13,5 +14,6 @@ def UpdatingTheAI():
 
     with open('ListOfAI', 'wb') as f:
         pickle.dump(NewListOfAI,f)  
+
 
 UpdatingTheAI()

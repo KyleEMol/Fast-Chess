@@ -15,13 +15,11 @@ def BasicGame(Player1,Player2):
 
     Board, Pieces = y[0], y[1]
     
-    while True:
+    while len(Pieces["WK"]) + len(Pieces["BK"]) == 18:
         MoveNum+=1
 
-        if MoveNum >= 500:
+        if MoveNum == 400:
             return 0.5
-
-        if len(Pieces["WK"]) + len(Pieces["BK"]) < 18:break
 
         Move = CurrentPlayer.Move(Board,Pieces,CurrentColour)
 
@@ -33,7 +31,6 @@ def BasicGame(Player1,Player2):
         CurrentColour = "B" if CurrentColour == "W" else "W"
 
     WhiteWin = int(len(Pieces["WK"]) == 9)
-    
     return WhiteWin
 
 def DisplayGame(Player1,Player2,WaitTime = 1,DispLastMove = True):
@@ -257,6 +254,52 @@ def EternalTournamentWithAI(ListOfPlayers = ListOfEveryBot(),NumberOfGamesPerMat
             pickle.dump(DictOfPlayers,f)
 
         with open('TournamentResults.csv', "w") as f:
+            writer = csv.writer(f)
+            writer.writerow(["PlayerName","PlayerRating"])
+            writer.writerow(["NumberOfRounds",NumberOfRounds])
+            for Player in ListOfPlayers:
+                writer.writerow([Player.Name,Player.Rating])
+
+def EternalSmallSavedTournament(ListOfPlayers = list ,NumberOfGamesPerMatch = 3):
+    FileName = "C:/Users/Kyle Molindo/Desktop/EMC/EMC 3/Chess/Fast-Chess/Small Tournaments/ " 
+    for Bot in ListOfPlayers:
+        FileName += " "+Bot.Name
+    NumberOfRounds = 0
+
+    try:
+        with open(FileName+'.csv', newline='') as csvfile:
+            reader = csv.reader(csvfile, delimiter=',', quotechar='|')
+            ListOfBotsElo = []
+            for row in reader:
+                if len(row) == 0:continue
+                if row[0] == "NumberOfRounds":
+                    NumberOfRounds = int(row[1])
+                    continue
+                ListOfBotsElo += [row]
+
+        for Bot in ListOfPlayers:
+            for Val in ListOfBotsElo:
+                if Val[0] == Bot.Name:
+                    Bot.Rating = float(Val[1])
+                    break
+
+    except FileNotFoundError:
+        pass
+
+    while True:
+        NumberOfRounds += 1
+        for _ in range(2):
+            random.shuffle(ListOfPlayers)
+            for Bot in ListOfPlayers:
+                random.shuffle(ListOfPlayers)
+                for Bot2 in ListOfPlayers:
+                    if Bot == Bot2:continue
+
+                    for _ in range(3):
+                        RatedGame(Bot, Bot2)
+        
+        ListOfPlayers.sort(key=(lambda x:x.Rating), reverse=True)
+        with open(FileName+'.csv', "w") as f:
             writer = csv.writer(f)
             writer.writerow(["PlayerName","PlayerRating"])
             writer.writerow(["NumberOfRounds",NumberOfRounds])

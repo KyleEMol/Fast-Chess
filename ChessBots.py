@@ -9,10 +9,8 @@ global BlackPieceNames
 WhitePieceNames = ["WP","WR","WN","WB","WQ","WK"]
 BlackPieceNames = ["BP","BR","BN","BB","BQ","BK"]
 
-def CalculatingRatingChange(Player1Elo,Player2Elo,NumberOfGames,Player1Wins,KVal = 25):
+def CalculatingRatingChange(Player1Elo,Player2Elo,NumberOfGames,Player1Wins,KVal = 15):
     #Results are from player one's perspectve 
-    Player1Elo = int(Player1Elo)
-    Player2Elo = int(Player2Elo)
 
     Player1ExpectedScore = NumberOfGames/(1 + (8**((Player2Elo-Player1Elo)/400)))
 
@@ -51,7 +49,6 @@ class BasicBot():
 """
 Decision Bots
 """
-
 class DecisionBot(BasicBot):
     def __init__(self):
         BasicBot.__init__(self)
@@ -61,8 +58,10 @@ class RandomMoveBot(DecisionBot):
         BasicBot.__init__(self)
     
     def Choose(self,BoardDict, LegalMoves, PiecesDict,  Colour):
-        
         return random.choice(LegalMoves)
+
+    def Evaluate(self,BoardDict, LegalMove, PiecesDict,  Colour):
+        return random.randint(-9,9)
 
 class BountyHunter(DecisionBot):
     def __init__(self):
@@ -71,11 +70,11 @@ class BountyHunter(DecisionBot):
     def Choose(self,BoardDict, LegalMoves, PiecesDict,  Colour):
         if len(LegalMoves) == 1:return LegalMoves[0]
 
-        PieceValDict = {"K":99999,"Q": 9, "R": 5, "B":3, "N": 3, "P": 1, None:0}
         BestMoveList = []
         BestMoveVal = None
         for Move in LegalMoves:
-            MoveVal = PieceValDict[BoardDict.get(Move[1],[0,None])[1]]
+            if BoardDict.get(Move[1],"Na")[1] == "K":return Move
+            MoveVal = self.Evaluate(BoardDict, Move, PiecesDict,  Colour)
 
             if BestMoveVal == None:
                 BestMoveVal = MoveVal
@@ -92,19 +91,24 @@ class BountyHunter(DecisionBot):
         
         return random.choice(BestMoveList)
 
+    def Evaluate(self,BoardDict, LegalMove, PiecesDict,  Colour):
+        PieceValDict = {"K":99999,"Q": 9, "R": 5, "B":3, "N": 3, "P": 1, None:0}
+        MoveVal = PieceValDict[BoardDict.get(LegalMove[1],[0,None])[1]]
+        return MoveVal
+
 class Bully(DecisionBot):
     def __init__(self):
         DecisionBot.__init__(self)
     
     def Choose(self,BoardDict, LegalMoves, PiecesDict,  Colour):
         if len(LegalMoves) == 1:return LegalMoves[0]
-
-        PieceValDict = {"K":99999,"Q": 9, "R": 5, "B":3, "N": 3, "P": 1, None:999999}
         
         BestMoveList = []
         BestMoveVal = None
         for Move in LegalMoves:
-            MoveVal = PieceValDict[BoardDict.get(Move[1],[0,None])[1]]
+            if BoardDict.get(Move[1],"Na")[1] == "K":return Move
+
+            MoveVal = self.Evaluate(BoardDict, Move, PiecesDict,  Colour)
 
             if BestMoveVal == None:
                 BestMoveVal = MoveVal
@@ -119,8 +123,58 @@ class Bully(DecisionBot):
                 BestMoveList.append(Move)
         
         return random.choice(BestMoveList)
+    
+    def Evaluate(self,BoardDict, LegalMove, PiecesDict,  Colour):
+        PieceValDict = {"K":99999,"Q": 9, "R": 5, "B":3, "N": 3, "P": 99998, None:1}
+        return PieceValDict[BoardDict.get(LegalMove[1],[0,None])[1]]
 
-ListOfDecisionBots = [RandomMoveBot,BountyHunter,Bully]
+class PositionalBot(DecisionBot):
+    def __init__(self):
+        DecisionBot.__init__(self)
+    
+    def Choose(self,BoardDict, LegalMoves, PiecesDict,  Colour):
+        if len(LegalMoves) == 1:return LegalMoves[0]
+        
+        BestMoveList = []
+        BestMoveVal = None
+        for Move in LegalMoves:
+            if BoardDict.get(Move[1],"Na")[1] == "K":return Move
+            MoveVal = self.Evaluate(BoardDict, Move, PiecesDict,  Colour)
+
+            if BestMoveVal == None:
+                BestMoveVal = MoveVal
+                BestMoveList = [Move]
+                continue
+
+            if MoveVal < BestMoveVal:
+                BestMoveList = [Move]
+                BestMoveVal = MoveVal
+            
+            elif MoveVal == BestMoveVal:
+                BestMoveList.append(Move)
+        
+        return random.choice(BestMoveList)
+    
+    def Evaluate(self,BoardDict, LegalMove, PiecesDict,  Colour):
+        
+        MoveVal = 0
+        TMove = str(LegalMove[0])
+        MoveVal  -= - abs(1 - int(TMove[0]))
+        MoveVal  -= - abs(1 - int(TMove[1]))
+        MoveVal  -= - abs(4 - int(TMove[3]))/2
+        MoveVal  -= - abs((8 if Colour == "W" else 1) - int(TMove[2]))/2  
+
+        TMove = str(LegalMove[1])
+        MoveVal  += - abs(1 - int(TMove[0]))
+        MoveVal  += - abs(1 - int(TMove[1]))
+        MoveVal  += - abs(4 - int(TMove[3]))/2
+        MoveVal  += - abs((8 if Colour == "W" else 1) - int(TMove[2]))
+
+        if BoardDict.get(LegalMove[1])[1] == "K":MoveVal *= -1
+        return MoveVal
+
+
+ListOfDecisionBots = [RandomMoveBot,BountyHunter,Bully,PositionalBot]
 
 """
 Filter Bots
@@ -228,7 +282,6 @@ class WarmongerBot(FilterBot):
         if len(LegalMoves) == 0: return None
 
         return self.DecisionBot.Choose(BoardDict = BoardDict, LegalMoves = LegalMoves, PiecesDict = PiecesDict,  Colour = Colour)
-
 class ChampionBot(FilterBot):
     def __init__(self,DecisionBot = RandomMoveBot):
         FilterBot.__init__(self,DecisionBot)
@@ -260,8 +313,9 @@ class ChampionBot(FilterBot):
         
         LegalMoves = [[self.Champion,Move] for Move in LegalMoves]
 
-        return self.DecisionBot.Choose(BoardDict = BoardDict, LegalMoves = LegalMoves, PiecesDict = PiecesDict,  Colour = Colour)
-
+        NewMove = self.DecisionBot.Choose(BoardDict = BoardDict, LegalMoves = LegalMoves, PiecesDict = PiecesDict,  Colour = Colour)
+        self.Champion = NewMove[1]
+        return NewMove
 class OnePiecePusher(FilterBot):
     def __init__(self,PieceName,DecisionBot = RandomMoveBot):
         FilterBot.__init__(self,DecisionBot)

@@ -479,7 +479,7 @@ def MovingAPiece(StartingSquare,FinalSquare,BoardDict,PiecesDict):
 
     NewPiecesDict[PieceName].remove(StartingSquare)
     if PieceName[1] == "P":
-        if str(FinalSquare)[2] == (8 if PieceName[1] == "B" else 0):
+        if str(FinalSquare)[2] == (8 if PieceName[1] == "B" else 1):
             PieceName = PieceName[0]+"Q"     
 
     NewBoardDict[FinalSquare] = PieceName

@@ -12,6 +12,7 @@ class EvaluatorBot():
         BestMoves = []
 
         for Move in LegalMoves:
+            if BoardDict.get(Move[1],"Na")[1] == "K":return Move
             NewBoard = MovingAPiece(Move[0],Move[1],BoardDict,PiecesDict)
             
             Eval = self.Evaluate(NewBoard[0],NewBoard[1],Colour)

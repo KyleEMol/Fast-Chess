@@ -212,17 +212,16 @@ def CheckingWaysToAttackKings(BoardDict = dict ,PieceDict = dict,Colour = str):
     
     return WaysToAttackKings
 
-
 class NeuralNetworkPlayer(BasicBot):
     def __init__(self,FilterBot = NoFilter(None),Name = "NeuralNetwork"):
         BasicBot.__init__(self)
         self.Name = Name
-        self.NeuralNetwork = NeuralNetwork(Layout = [58,58,58,14,1])
+        self.NeuralNetwork = NeuralNetwork(Layout = [59,59,59,14,1])
         self.FilterBot = FilterBot
         self.TotalGameTime, self.GamesPlayed = 0,0
 
     def Fitness(self):
-        return self.Rating + (10 - self.TotalGameTime/self.GamesPlayed)
+        return self.Rating - (self.TotalGameTime/self.GamesPlayed)/4
 
     def Move(self,BoardDict ,PiecesDict, Colour): 
 
@@ -261,10 +260,10 @@ class NeuralNetworkPlayer(BasicBot):
         NewZ = [0,0,0]
         OldW = [0,0,0]
         NewW = [0,0,0]
-        OldX = [0 for _ in range(8)]
-        NewX = [0 for _ in range(8)]
-        OldY = [0 for _ in range(8)]
-        NewY = [0 for _ in range(8)]
+        OldX = [0,0,0,0,0,0,0,0]
+        OldY = [0,0,0,0,0,0,0,0]
+        NewY = [0,0,0,0,0,0,0,0]
+        NewX = [0,0,0,0,0,0,0,0]
         
         TMove = str(Move[0])
         OldZ[int(TMove[0])-1] = 1
@@ -317,8 +316,8 @@ class NeuralNetworkPlayer(BasicBot):
                         IsOwnKingAttacked = False
 
 
-        #OppPiece  + OwnKingAttacked + IsOpponentKingAttacked + before(Z + W + Y  dist from starting + X) + after(Z + W + Y  dist from starting + X)
-        Input = OwnPiece + OppPiece + [int(IsOwnKingAttacked)] + [int(IsOpponentKingAttacked)] + OldZ + OldW + OldX + OldY + NewZ + NewW + NewX + NewY
+        #OppPiece  + OwnKingAttacked + IsOpponentKingAttacked + before(Z + W + Y  dist from starting + X) + after(Z + W + Y  dist from starting + X) + Is White
+        Input = OwnPiece + OppPiece + [int(IsOwnKingAttacked)] + [int(IsOpponentKingAttacked)] + OldZ + OldW + OldX + OldY + NewZ + NewW + NewX + NewY + [Colour == "W"]
         #Weights = [0,-1,-1.5,-2.5,-3.5,-5]+ list(map((lambda x: x + 7),[1,3,3,5,9,100000])) + [-10000] + [3] + [0,-2,0] + [0,-2,0] + list(map((lambda x:x*0.5),[-3,-1,-4,-7,-7,-4,-1,-3])) + list(map((lambda x:x*0.5),[0,-1,-1,-3,-6,-6,-10,-15]))+ [0,2,0] + [0,2,0] + list(map((lambda x:x*0.5),[-2,1,4,7,7,4,1,-2])) + list(map((lambda x:x*0.5),[0,1,1,3,6,6,10,15]))
 
         Evaluation = round(float(self.NeuralNetwork.Output(Input)),2)

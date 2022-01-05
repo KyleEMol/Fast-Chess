@@ -2,6 +2,26 @@ from Game import *
 from NeuralNetworkPlayer import *
 from KylesWeightings import *
 
+
+def EvaluatingAListOfAI(ListOfAI = list):
+    NewListOfAI = []
+    for AI in ListOfAI:
+        AI.Rating = 1000
+
+        ListOfOppBots =  [WarmongerBot(BountyHunter),WarmongerBot(Bully),KylesWeighting()]
+        
+
+        ListOfOppBots[0].Rating,ListOfOppBots[1].Rating,ListOfOppBots[2].Rating = 1090,990,920
+        for Bot in ListOfOppBots:
+            TwoPlayers = [AI, Bot] 
+            random.shuffle(TwoPlayers)
+            RatedGame(TwoPlayers[0], TwoPlayers[1])
+
+        NewListOfAI.append(AI)
+
+    return NewListOfAI
+
+
 def EternalNeuralNetworkTournament(AIPerGen=20,NumberOfGamesPerMatch = 2,NumberOfMatches = 3):
     
     #ListOfHardCodedBots = GettingBotEloForList([WarmongerBot(BountyHunter),BishopBudger(BountyHunter),WarmongerBot(ComparingCollectorBot),KylesWeighting(),BasicBot()])
@@ -56,7 +76,8 @@ def EternalNeuralNetworkTournament(AIPerGen=20,NumberOfGamesPerMatch = 2,NumberO
             ListOfAI.append(NewAI)
             NumberOfAI += 1 
 
-        for AI in ListOfAI:AI.Rating = 1000        
+        for AI in ListOfAI:
+            AI.Rating = 1000        
         
         for Player1 in ListOfAI:
             for _ in range(NumberOfMatches-1):
@@ -98,10 +119,22 @@ def EternalNeuralNetworkTournament(AIPerGen=20,NumberOfGamesPerMatch = 2,NumberO
             for Player in ListOfAI:
                 writer.writerow([Player.Name,Player.Rating])
         
-        with open('ListOfAI', 'wb') as f:pickle.dump(ListOfAI,f)
+        with open('ListOfAI', 'wb') as f:
+            pickle.dump(ListOfAI,f)
         
         if NumberOfRounds%10 == 0 :
+            ListOfAI = EvaluatingAListOfAI(ListOfAI = ListOfAI)
+
+            with open('C:/Users/Kyle Molindo/Desktop/EMC/EMC 3/Chess/Fast-Chess/Saved AI Rounds/AITournamentResults '+ str(NumberOfRounds)+".csv", "w") as f:
+                writer = csv.writer(f)
+                writer.writerow(["PlayerName","PlayerRating"])
+                writer.writerow(["NumberOfRounds",NumberOfRounds])
+                writer.writerow(["NumberOfAI",NumberOfAI])
+                for Player in ListOfAI:
+                    writer.writerow([Player.Name,Player.Rating])
+
+
             AverageRating = sum([AI.Rating for AI in ListOfAI])/len(ListOfAI)
             AverageTimeTaken = sum([(AI.TotalGameTime / AI.GamesPlayed) for AI in ListOfAI])/len(ListOfAI)
-            TList = [AverageRating,AverageTimeTaken] + ListOfAI
-            with open('ListOfAIRound'+str(NumberOfRounds), 'wb') as f:pickle.dump(TList,f)
+            TList = [AverageRating,AverageTimeTaken,NumberOfRounds,NumberOfAI] + ListOfAI
+            with open('C:/Users/Kyle Molindo/Desktop/EMC/EMC 3/Chess/Fast-Chess/Saved AI Rounds/ListOfAIRound '+str(NumberOfRounds)+".pckle", 'wb') as f:pickle.dump(TList,f)
